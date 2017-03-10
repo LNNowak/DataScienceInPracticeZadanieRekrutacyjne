@@ -49,6 +49,10 @@ class Task:
         if dependencies is None:
             dependencies = self.get_dependencies()
 
+        if len(dependencies) == 0 and \
+                (self.args is None or len(self.args) == 0):
+            raise ValueError('Task without dependencies must have arguments.')
+
         dep_list = []  # lista wynikowa z przetworzonymi wartosciami
         # najpierw wartosci z podzadan
         for dependency in dependencies:
