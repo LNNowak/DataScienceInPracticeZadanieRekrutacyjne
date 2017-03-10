@@ -14,7 +14,10 @@ def execute(task):
     :param task: Zadanie do przetworzenia.
     :return: Zagregowana wartosc z listy przetworzonych wartosci zadania.
     """
-    return reduce(lambda fst, snd: fst + snd, task.run())
+    values = task.run()
+    if values is None or len(values) == 0:
+        return values
+    return reduce(lambda fst, snd: fst + snd, values)
 
 
 class Task:
@@ -48,10 +51,6 @@ class Task:
 
         if dependencies is None:
             dependencies = self.get_dependencies()
-
-        if len(dependencies) == 0 and \
-                (self.args is None or len(self.args) == 0):
-            raise ValueError('Task without dependencies must have arguments.')
 
         dep_list = []  # lista wynikowa z przetworzonymi wartosciami
         # najpierw wartosci z podzadan
