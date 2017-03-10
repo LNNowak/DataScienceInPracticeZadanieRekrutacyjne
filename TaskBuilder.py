@@ -40,6 +40,10 @@ class Task:
         skojarzonej instancji TaskBuilder.
         :return: Lista przetworzonych wartosci.
         """
+        prv_done_values = self.task_builder.get_run_task_values(self)
+        if prv_done_values is not None:
+            return prv_done_values
+
         if dependencies is None:
             dependencies = self.get_dependencies()
 
@@ -52,6 +56,9 @@ class Task:
         if self.args is not None:
             for arg in self.args:
                 dep_list.append(self.func(arg))
+
+        # dodanie wyniku do listy już przetworzonych węzłów
+        self.task_builder.mark_task_as_run(self, dep_list)
 
         return dep_list
 
@@ -81,6 +88,7 @@ class TaskBuilder:
         self._task_node = namedtuple('TaskNode', ['task', 'dependencies'])
         # graf jako słownik
         self._graph = defaultdict()
+        self._alreadyRunTasks = defaultdict()
 
     def reset(self):
         """Resetowanie grafu."""
@@ -122,3 +130,9 @@ class TaskBuilder:
         task = Task(task_name, self, func, args)
         self.add_task(task)
         return task
+
+    def mark_task_as_run(self, task, values_list):
+        self._alreadyRunTasks[task.task_name] = values_list
+
+    def get_run_task_values(self, task):
+        return self._alreadyRunTasks.get(task.task_name)
