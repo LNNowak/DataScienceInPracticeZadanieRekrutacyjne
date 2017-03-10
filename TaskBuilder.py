@@ -1,6 +1,6 @@
-from collections import defaultdict
-from collections import namedtuple
+from collections import defaultdict, namedtuple
 from functools import reduce
+
 
 # Generalnie zadanie to nic innego jak zaimplementowanie acyklicznego grafu
 # skierowanego. Ze wzgledu na brak wiekszej ilosci czasu, ponizej prezentuje
@@ -19,6 +19,7 @@ def execute(task):
 
 class Task:
     """Zadanie do wykonania."""
+
     def __init__(self, task_name, task_builder, func=None, args=None):
         """Konstruktor.
         :param task_name: Nazwa zadania.
@@ -40,6 +41,7 @@ class Task:
         skojarzonej instancji TaskBuilder.
         :return: Lista przetworzonych wartosci.
         """
+        # najpierw sprawdzenie, czy nie bylismy juz w tym wezle
         prv_done_values = self.task_builder.get_run_task_values(self)
         if prv_done_values is not None:
             return prv_done_values
@@ -57,7 +59,7 @@ class Task:
             for arg in self.args:
                 dep_list.append(self.func(arg))
 
-        # dodanie wyniku do listy już przetworzonych węzłów
+        # dodanie wyniku do listy juz przetworzonych wezlow
         self.task_builder.mark_task_as_run(self, dep_list)
 
         return dep_list
@@ -82,6 +84,7 @@ class Task:
 
 class TaskBuilder:
     """Klasa budująca wezly zadan i zaleznosci miedzy nimi."""
+
     def __init__(self):
         """Konstruktor."""
         # pomocniczy model wezlow zadan
@@ -132,7 +135,17 @@ class TaskBuilder:
         return task
 
     def mark_task_as_run(self, task, values_list):
+        """Oznaczenie zadania jako wykonanego.
+        :param task: Zadanie do oznaczenia.
+        :param values_list: Wartosci zwrocone po wykonaniu wezla.
+        """
         self._alreadyRunTasks[task.task_name] = values_list
 
     def get_run_task_values(self, task):
+        """Zwrocenie wartosci wykonanego zadania. None, jesli zadanie nie
+        zostalo jeszcze wykonane.
+        :param task: Zadanie do sprawdzenia.
+        :return: Wczesniej obliczone wartosci lub None, jesli zadanie nie
+        zostalo jeszcze wykonane.
+        """
         return self._alreadyRunTasks.get(task.task_name)
